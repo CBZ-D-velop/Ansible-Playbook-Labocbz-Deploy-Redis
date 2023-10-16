@@ -1,0 +1,5 @@
+---
+- name: "Include labocbz.deploy_redis playbook"
+  tags:
+      - "labocbz.deploy_redis"
+  ansible.builtin.import_playbook: "../../playbook.yml"
