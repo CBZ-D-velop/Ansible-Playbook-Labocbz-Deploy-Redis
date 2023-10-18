@@ -1,5 +1,5 @@
 ---
-- name: "labocbz.deploy_redis"
+- name: "Deploy Redis"
   hosts: "all"
   gather_facts: true
   remote_user: root
@@ -7,5 +7,51 @@
   become: true
   become_method: sudo
   become_user: root
+  tags:
+    - "labocbz.install_redis"
 
   tasks:
+    - name: "Include labocbz.add_certificates"
+      tags:
+        - "labocbz.add_certificates"
+      loop: "{{ inv_redis_cert_bundles }}"
+      loop_control:
+        loop_var: bundle
+      when: inv_redis_cert_bundles is defined
+      vars:
+        add_certificates_bundle_name: "{{ bundle.name }}"
+        add_certificates_bundle_type: "{{ bundle.type }}"
+        add_certificates_bundle_src: "{{ bundle.src }}"
+        add_certificates_bundle_dest: "{{ bundle.dest }}"
+        add_certificates_bundle_src_user: "{{ bundle.src_user }}"
+        add_certificates_bundle_src_password: "{{ bundle.src_password }}"
+        add_certificates_bundle_dest_user: "{{ bundle.dest_user }}"
+        add_certificates_bundle_dest_group: "{{ bundle.dest_group }}"
+        add_certificates_bundle_dest_mode: "{{ bundle.dest_mode }}"
+      ansible.builtin.include_role:
+        name: "labocbz.add_certificates"
+
+    - name: "Include labocbz.install_redis"
+      tags:
+        - "labocbz.install_redis"
+      loop: "{{ inv_redis_ports }}"
+      loop_control:
+        loop_var: port
+      vars:
+        redis_bind: "{{ inv_redis_bind }}"
+        redis_port: "{{ port }}"
+        redis_proteced_mode: "{{ inv_redis_proteced_mode }}"
+        redis_loglevel: "{{ inv_redis_loglevel }}"
+        redis_requirepass: "{{ inv_redis_requirepass }}"
+        redis_cluster: "{{ inv_redis_cluster }}"
+        redis_path: "{{ inv_redis_path }}"
+        redis_conf: "{{ inv_redis_conf }}"
+        redis_ssl: "{{ inv_redis_ssl }}"
+        redis_ssl_domain: "{{ inv_redis_ssl_domain }}"
+        redis_ssl_path: "{{ inv_redis_ssl_path }}"
+        redis_ssl_key: "{{ inv_redis_ssl_key }}"
+        redis_ssl_cert: "{{ inv_redis_ssl_cert }}"
+        redis_ssl_ca: "{{ inv_redis_ssl_ca }}"
+        redis_ssl_auth_client: "{{ inv_redis_ssl_auth_client }}"
+      ansible.builtin.include_role:
+        name: "labocbz.install_redis"
