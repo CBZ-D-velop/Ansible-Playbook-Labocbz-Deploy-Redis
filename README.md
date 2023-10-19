@@ -18,7 +18,15 @@
 
 An Ansible playbook to deploy and configure Redis on your host.
 
+This Ansible playbook streamlines the installation of a standalone Redis service or daemon. It offers the flexibility to provide a list of ports for installing multiple Redis services on those specified ports. This feature is designed to enable the creation of a Redis cluster with just three available servers instead of the standard nine minimum requirement.
+
+With this playbook, you can effortlessly set up Redis to suit your specific needs, whether it's a single Redis instance or a simplified Redis cluster, making it a powerful tool for managing your data caching and storage solutions.
+
 ## Deployment diagramm
+
+![](./assets/Ansible-Playbook-Labocbz-Deploy-Redis.drawio.svg)
+
+This is a potential deployment carried out using this playbook. We can observe a Redis service component along with its subsystem. This subsystem consists of nine servers distributed across three hosts. Therefore, a triple-master cluster with six slaves is feasible. Communications are end-to-end encrypted with TLS, and mTLS is possible, although it is currently not well-managed by Redis.
 
 ## Tests and simulations
 
@@ -92,6 +100,13 @@ Here you can put your change to keep a trace of your work and decisions.
 
 * First init of this playbook with the bootstrap_playbook playbook by Lord Robin Crombez
 
+### 2023-10-19: Fix and push
+
+* Fix permissions on certs
+* Playbook install a Redis standole service
+* Playbook can install multiples Redis services and daemon
+* Playbook doesn't init the cluster, for now
+
 ## Authors
 
 * Lord Robin Crombez
@@ -100,3 +115,4 @@ Here you can put your change to keep a trace of your work and decisions.
 
 * [Ansible playbook documentation](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_playbooks.html)
 * [Ansible Molecule documentation](https://molecule.readthedocs.io/)
+* [labocbz.install_redis](https://github.com/CBZ-D-velop/Ansible-Role-Labocbz-Install-Redis.git)
