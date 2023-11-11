@@ -1,4 +1,6 @@
 ---
+inv_install_redis: true
+
 inv_redis_bind: "0.0.0.0"
 inv_redis_proteced_mode: "no"
 inv_redis_loglevel: "notice"
