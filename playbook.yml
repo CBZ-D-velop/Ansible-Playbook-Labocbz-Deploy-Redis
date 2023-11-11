@@ -12,7 +12,7 @@
 
   tasks:
     
-    - name: "Install Grafana"
+    - name: "Install Redis"
       when: inv_install_redis | default(false)
       block:
         - name: "Include labocbz.prepare_host"
