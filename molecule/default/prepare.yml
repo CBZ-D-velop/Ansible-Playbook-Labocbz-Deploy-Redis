@@ -5,8 +5,8 @@
   gather_facts: true
   tasks:
 
-    #- name: "Include cryptographic content var file"
-    #  ansible.builtin.include_vars: "../../tests/certs/main.yml"
+    - name: "Include cryptographic content var file"
+      ansible.builtin.include_vars: "../../tests/certs/main.yml"
 
     - name: "Include labocbz.prepare_host"
       tags:

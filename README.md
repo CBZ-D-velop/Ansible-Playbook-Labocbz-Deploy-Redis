@@ -107,6 +107,11 @@ Here you can put your change to keep a trace of your work and decisions.
 * Playbook can install multiples Redis services and daemon
 * Playbook doesn't init the cluster, for now
 
+### 2023-11-11: Prepare and Boolean
+
+* Prepare host role is now called
+* You can install or not by define a boolean
+
 ## Authors
 
 * Lord Robin Crombez
