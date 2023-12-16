@@ -10,7 +10,7 @@
       block:
         - name: "Get Redis service current state"
           register: redis_service_status
-          loop: "{{ inv_redis_ports }}"
+          loop: "{{ inv_install_redis_ports }}"
           loop_control:
             loop_var: port
           failed_when: not redis_service_status.status.ActiveState == 'active'
@@ -20,14 +20,14 @@
         - name: "Check Redis conf file"
           register: folder_check
           failed_when: not folder_check.stat.exists
-          loop: "{{ inv_redis_ports }}"
+          loop: "{{ inv_install_redis_ports }}"
           loop_control:
             loop_var: port
           ansible.builtin.stat:
-            path: "{{ inv_redis_conf }}"
+            path: "{{ inv_install_redis_conf }}"
 
         - name: "Check Redis connectivity"
-          loop: "{{ inv_redis_ports }}"
+          loop: "{{ inv_install_redis_ports }}"
           loop_control:
             loop_var: port
           ansible.builtin.wait_for:
@@ -36,95 +36,95 @@
             timeout: 120
 
     - name: "Verify Redis authentication"
-      when: inv_redis_requirepass is defined
+      when: inv_install_redis_requirepass is defined
       block:
         - name: "Verify auth with no client cert, no ssl, but password"
-          when: not inv_redis_ssl and inv_redis_ssl_auth_client == "no"
+          when: not inv_install_redis_ssl and inv_install_redis_ssl_auth_client == "no"
           register: redis_auth_result
           failed_when: redis_auth_result.stdout != "PONG"
           changed_when: redis_auth_result.rc != 0
-          loop: "{{ inv_redis_ports }}"
+          loop: "{{ inv_install_redis_ports }}"
           loop_control:
             loop_var: port
           ansible.builtin.command:
-            cmd: "redis-cli -a {{ inv_redis_requirepass }} -h {{ inventory_hostname }} -p {{ port }} --no-auth-warning ping"
+            cmd: "redis-cli -a {{ inv_install_redis_requirepass }} -h {{ inventory_hostname }} -p {{ port }} --no-auth-warning ping"
 
         - name: "Verify auth with client cert, no ssl and password"
-          when: not inv_redis_ssl and inv_redis_ssl_auth_client == "yes"
+          when: not inv_install_redis_ssl and inv_install_redis_ssl_auth_client == "yes"
           register: redis_auth_result
           failed_when: redis_auth_result.stdout != "PONG"
           changed_when: redis_auth_result.rc != 0
-          loop: "{{ inv_redis_ports }}"
+          loop: "{{ inv_install_redis_ports }}"
           loop_control:
             loop_var: port
           ansible.builtin.command:
-            cmd: "redis-cli --cert {{ inv_redis_ssl_cert }} --key {{ inv_redis_ssl_key }} -a {{ inv_redis_requirepass }} -h {{ inventory_hostname }} -p {{ port }} --no-auth-warning ping"
+            cmd: "redis-cli --cert {{ inv_install_redis_ssl_cert }} --key {{ inv_install_redis_ssl_key }} -a {{ inv_install_redis_requirepass }} -h {{ inventory_hostname }} -p {{ port }} --no-auth-warning ping"
 
         - name: "Verify auth with no client cert, ssl and password"
-          when: inv_redis_ssl and inv_redis_ssl_auth_client == "no"
+          when: inv_install_redis_ssl and inv_install_redis_ssl_auth_client == "no"
           register: redis_auth_result
           failed_when: redis_auth_result.stdout != "PONG"
           changed_when: redis_auth_result.rc != 0
-          loop: "{{ inv_redis_ports }}"
+          loop: "{{ inv_install_redis_ports }}"
           loop_control:
             loop_var: port
           ansible.builtin.command:
-            cmd: "redis-cli --tls -a {{ inv_redis_requirepass }} -h {{ inventory_hostname }} -p {{ port }} --no-auth-warning ping"
+            cmd: "redis-cli --tls -a {{ inv_install_redis_requirepass }} -h {{ inventory_hostname }} -p {{ port }} --no-auth-warning ping"
 
         - name: "Verify auth with client cert, ssl and password"
-          when: inv_redis_ssl and inv_redis_ssl_auth_client == "yes"
+          when: inv_install_redis_ssl and inv_install_redis_ssl_auth_client == "yes"
           register: redis_auth_result
           failed_when: redis_auth_result.stdout != "PONG"
           changed_when: redis_auth_result.rc != 0
-          loop: "{{ inv_redis_ports }}"
+          loop: "{{ inv_install_redis_ports }}"
           loop_control:
             loop_var: port
           ansible.builtin.command:
-            cmd: "redis-cli --tls --cert {{ inv_redis_ssl_cert }} --key {{ inv_redis_ssl_key }} -a {{ inv_redis_requirepass }} -h {{ inventory_hostname }} -p {{ port }} --no-auth-warning ping"
+            cmd: "redis-cli --tls --cert {{ inv_install_redis_ssl_cert }} --key {{ inv_install_redis_ssl_key }} -a {{ inv_install_redis_requirepass }} -h {{ inventory_hostname }} -p {{ port }} --no-auth-warning ping"
 
     - name: "Verify Redis NO authentication"
-      when: not inv_redis_requirepass is defined
+      when: not inv_install_redis_requirepass is defined
       block:
         - name: "Verify auth with no client cert, no ssl, but no password"
-          when: not inv_redis_ssl and inv_redis_ssl_auth_client == "no"
+          when: not inv_install_redis_ssl and inv_install_redis_ssl_auth_client == "no"
           register: redis_auth_result
           failed_when: redis_auth_result.stdout != "PONG"
           changed_when: redis_auth_result.rc != 0
-          loop: "{{ inv_redis_ports }}"
+          loop: "{{ inv_install_redis_ports }}"
           loop_control:
             loop_var: port
           ansible.builtin.command:
             cmd: "redis-cli -h {{ inventory_hostname }} -p {{ port }} --no-auth-warning ping"
 
         - name: "Verify auth with client cert, no ssl and no password"
-          when: not inv_redis_ssl and inv_redis_ssl_auth_client == "yes"
+          when: not inv_install_redis_ssl and inv_install_redis_ssl_auth_client == "yes"
           register: redis_auth_result
           failed_when: redis_auth_result.stdout != "PONG"
           changed_when: redis_auth_result.rc != 0
-          loop: "{{ inv_redis_ports }}"
+          loop: "{{ inv_install_redis_ports }}"
           loop_control:
             loop_var: port
           ansible.builtin.command:
-            cmd: "redis-cli --cert {{ inv_redis_ssl_cert }} --key {{ inv_redis_ssl_key }} -h {{ inventory_hostname }} -p {{ port }} --no-auth-warning ping"
+            cmd: "redis-cli --cert {{ inv_install_redis_ssl_cert }} --key {{ inv_install_redis_ssl_key }} -h {{ inventory_hostname }} -p {{ port }} --no-auth-warning ping"
 
         - name: "Verify auth with no client cert, ssl and no password"
-          when: inv_redis_ssl and inv_redis_ssl_auth_client == "no"
+          when: inv_install_redis_ssl and inv_install_redis_ssl_auth_client == "no"
           register: redis_auth_result
           failed_when: redis_auth_result.stdout != "PONG"
           changed_when: redis_auth_result.rc != 0
-          loop: "{{ inv_redis_ports }}"
+          loop: "{{ inv_install_redis_ports }}"
           loop_control:
             loop_var: port
           ansible.builtin.command:
             cmd: "redis-cli --tls -h {{ inventory_hostname }} -p {{ port }} --no-auth-warning ping"
 
         - name: "Verify auth with client cert, ssl and no password"
-          when: inv_redis_ssl and inv_redis_ssl_auth_client == "yes"
+          when: inv_install_redis_ssl and inv_install_redis_ssl_auth_client == "yes"
           register: redis_auth_result
           failed_when: redis_auth_result.stdout != "PONG"
           changed_when: redis_auth_result.rc != 0
-          loop: "{{ inv_redis_ports }}"
+          loop: "{{ inv_install_redis_ports }}"
           loop_control:
             loop_var: port
           ansible.builtin.command:
-            cmd: "redis-cli --cert {{ inv_redis_ssl_cert }} --key {{ inv_redis_ssl_key }} -h {{ inventory_hostname }} -p {{ port }} --no-auth-warning ping"
+            cmd: "redis-cli --cert {{ inv_install_redis_ssl_cert }} --key {{ inv_install_redis_ssl_key }} -h {{ inventory_hostname }} -p {{ port }} --no-auth-warning ping"

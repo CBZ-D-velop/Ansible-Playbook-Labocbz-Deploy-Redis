@@ -112,6 +112,12 @@ Here you can put your change to keep a trace of your work and decisions.
 * Prepare host role is now called
 * You can install or not by define a boolean
 
+### 2023-12-16: System users
+
+* Role can now use system users and address groups
+* Added 10 years certs
+* Added log rotation
+
 ## Authors
 
 * Lord Robin Crombez
