@@ -118,6 +118,11 @@ Here you can put your change to keep a trace of your work and decisions.
 * Added 10 years certs
 * Added log rotation
 
+### 2023-12-18: Free / users
+
+* Playbook doesnt use the remote root accout anymore
+* No more free strategy
+
 ## Authors
 
 * Lord Robin Crombez
