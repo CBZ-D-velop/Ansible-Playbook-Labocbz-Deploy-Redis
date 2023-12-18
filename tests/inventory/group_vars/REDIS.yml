@@ -1,9 +1,12 @@
 ---
+inv_install_redis: true
+
 inv_prepare_host_redis_system_users:
   - login: "redis"
     group: "redis"
 
-inv_install_redis: true
+inv_logrotate_redis_configurations:
+  - "redis-server"
 
 inv_install_redis_bind: "0.0.0.0"
 inv_install_redis_proteced_mode: "no"
@@ -29,9 +32,6 @@ inv_install_redis_ssl_key: "{{ inv_install_redis_ssl_path }}/{{ inv_install_redi
 inv_install_redis_ssl_cert: "{{ inv_install_redis_ssl_path }}/{{ inv_install_redis_ssl_domain }}/{{ inv_install_redis_ssl_domain }}.pem.crt"
 inv_install_redis_ssl_ca: "{{ inv_install_redis_ssl_path }}/{{ inv_install_redis_ssl_domain }}/ca-chain.pem.crt"
 inv_install_redis_ssl_auth_client: "no"
-
-inv_logrotate_configurations_redis:
-  - "redis-server"
 
 inv_install_redis_cert_bundles:
   - name: "My-Local-Ansible-Root-CA.pem.crt"

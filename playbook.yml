@@ -2,13 +2,9 @@
 - name: "Deploy Redis"
   hosts: "{{ tower_env | default([]) }}"
   gather_facts: true
-  remote_user: root
-  strategy: free
   become: true
   become_method: sudo
   become_user: root
-  tags:
-    - "labocbz.install_redis"
 
   tasks:
     
@@ -72,6 +68,6 @@
           tags:
             - "labocbz.add_logrotate_confs"
           vars:
-            logrotate_configurations: "{{ inv_logrotate_configurations_redis }}"
+            logrotate_configurations: "{{ inv_logrotate_redis_configurations }}"
           ansible.builtin.include_role:
             name: "labocbz.add_logrotate_confs"
