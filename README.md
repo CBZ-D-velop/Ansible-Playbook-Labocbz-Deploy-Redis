@@ -22,11 +22,13 @@ This Ansible playbook streamlines the installation of a standalone Redis service
 
 With this playbook, you can effortlessly set up Redis to suit your specific needs, whether it's a single Redis instance or a simplified Redis cluster, making it a powerful tool for managing your data caching and storage solutions.
 
+Redis clustering is base on Master/Slave replication. One Master is available at a time for Write operations and Slave replicate data, so Read operations can be done on all servers. If the Master is down, the Sentienl service will perform a Master election with other server.
+
 ## Deployment diagramm
 
 ![](./assets/Ansible-Playbook-Labocbz-Deploy-Redis.drawio.svg)
 
-This is a potential deployment carried out using this playbook. We can observe a Redis service component along with its subsystem. This subsystem consists of nine servers distributed across three hosts. Therefore, a triple-master cluster with six slaves is feasible. Communications are end-to-end encrypted with TLS, and mTLS is possible, although it is currently not well-managed by Redis.
+This is a potential deployment carried out using this playbook. We can observe a Redis service component along with its subsystem. This subsystem consists of nine servers distributed across three hosts. Therefore, a Master/Slave replication cluster with 3 servers is possible. Communications are end-to-end encrypted with TLS, and mTLS can be enabled to, you have to add a load balancer for write opérations.
 
 ## Tests and simulations
 
@@ -122,6 +124,15 @@ Here you can put your change to keep a trace of your work and decisions.
 
 * Playbook doesnt use the remote root accout anymore
 * No more free strategy
+
+### 2024-02-21: Fix and CI
+
+* Added support for new CI base
+* Edit all vars with __
+* Added test
+* Added multi cluster with Molecule
+* Added cluster start (Sentinel)
+* Removed idempotency (Sentinel edition files)
 
 ## Authors
 
