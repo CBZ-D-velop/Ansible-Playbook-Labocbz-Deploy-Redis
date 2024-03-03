@@ -1,131 +1,106 @@
 ---
 # Don't forget to keep this file updated
 # molecule/<scenario>/verify.yml
-- name: "Verify REDIS"
-  hosts: "all:&REDIS"
+- name: "Verify"
+  hosts: "local"
   gather_facts: false
   tasks:
 
-    - name: "Verify Redis"
-      when: inv_install_redis | default(false)
+    - name: "Verify Redis installations"
       block:
         - name: "Get Redis service current state"
-          register: redis_service_status
-          loop: "{{ inv_install_redis_ports }}"
-          loop_control:
-            loop_var: port
-          failed_when: not redis_service_status.status.ActiveState == 'active'
+          register: install_redis__service_status
+          failed_when: not install_redis__service_status.status.ActiveState == 'active'
           ansible.builtin.systemd:
-            name: "redis@{{ port }}"
-
-        - name: "Check Redis conf file"
-          register: folder_check
-          failed_when: not folder_check.stat.exists
-          loop: "{{ inv_install_redis_ports }}"
-          loop_control:
-            loop_var: port
-          ansible.builtin.stat:
-            path: "{{ inv_install_redis_conf }}"
+            name: "redis-server"
 
         - name: "Check Redis connectivity"
-          loop: "{{ inv_install_redis_ports }}"
-          loop_control:
-            loop_var: port
           ansible.builtin.wait_for:
             host: "{{ inventory_hostname }}"
-            port: "{{ port }}"
+            port: "{{ inv_install_redis__port }}"
             timeout: 120
 
-        - name: "Verify Redis authentication"
-          when: inv_install_redis_requirepass is defined
-          block:
-            - name: "Verify auth with no client cert, no ssl, but password"
-              when: not inv_install_redis_ssl and inv_install_redis_ssl_auth_client == "no"
-              register: redis_auth_result
-              failed_when: redis_auth_result.stdout != "PONG"
-              changed_when: redis_auth_result.rc != 0
-              loop: "{{ inv_install_redis_ports }}"
-              loop_control:
-                loop_var: port
-              ansible.builtin.command:
-                cmd: "redis-cli -a {{ inv_install_redis_requirepass }} -h {{ inventory_hostname }} -p {{ port }} --no-auth-warning ping"
+    - name: "Set args: Auth"
+      when: inv_install_redis__requirepass | default(false)
+      ansible.legacy.set_fact:
+        redis_auth: "-a {{ inv_install_redis__requirepass }} --no-auth-warning"
 
-            - name: "Verify auth with client cert, no ssl and password"
-              when: not inv_install_redis_ssl and inv_install_redis_ssl_auth_client == "yes"
-              register: redis_auth_result
-              failed_when: redis_auth_result.stdout != "PONG"
-              changed_when: redis_auth_result.rc != 0
-              loop: "{{ inv_install_redis_ports }}"
-              loop_control:
-                loop_var: port
-              ansible.builtin.command:
-                cmd: "redis-cli --cert {{ inv_install_redis_ssl_cert }} --key {{ inv_install_redis_ssl_key }} -a {{ inv_install_redis_requirepass }} -h {{ inventory_hostname }} -p {{ port }} --no-auth-warning ping"
+    - name: "Set args: TLS"
+      when: inv_install_redis__ssl | default(false)
+      ansible.legacy.set_fact:
+        redis_tls: "--tls"
 
-            - name: "Verify auth with no client cert, ssl and password"
-              when: inv_install_redis_ssl and inv_install_redis_ssl_auth_client == "no"
-              register: redis_auth_result
-              failed_when: redis_auth_result.stdout != "PONG"
-              changed_when: redis_auth_result.rc != 0
-              loop: "{{ inv_install_redis_ports }}"
-              loop_control:
-                loop_var: port
-              ansible.builtin.command:
-                cmd: "redis-cli --tls -a {{ inv_install_redis_requirepass }} -h {{ inventory_hostname }} -p {{ port }} --no-auth-warning ping"
+    - name: "Set args: mTLS"
+      when: inv_install_redis__ssl_client_auth | default(false)
+      ansible.legacy.set_fact:
+        redis_mtls: "--cert {{ inv_install_redis__ssl_cert }} --key {{ inv_install_redis__ssl_key }}"
 
-            - name: "Verify auth with client cert, ssl and password"
-              when: inv_install_redis_ssl and inv_install_redis_ssl_auth_client == "yes"
-              register: redis_auth_result
-              failed_when: redis_auth_result.stdout != "PONG"
-              changed_when: redis_auth_result.rc != 0
-              loop: "{{ inv_install_redis_ports }}"
-              loop_control:
-                loop_var: port
-              ansible.builtin.command:
-                cmd: "redis-cli --tls --cert {{ inv_install_redis_ssl_cert }} --key {{ inv_install_redis_ssl_key }} -a {{ inv_install_redis_requirepass }} -h {{ inventory_hostname }} -p {{ port }} --no-auth-warning ping"
+    - name: "Verify PING"
+      register: install_redis__result
+      failed_when: install_redis__result.stdout != "PONG"
+      changed_when: install_redis__result.rc != 0
+      ansible.builtin.shell: |
+        redis-cli -h {{ inventory_hostname }} -p {{ inv_install_redis__port }} \
+        {% if redis_auth | default(false) %}
+        {{ redis_auth }} \
+        {% endif %}
+        {% if redis_tls | default(false) %}
+        {{ redis_tls }} \
+        {% endif %}
+        {% if redis_mtls | default(false) %}
+        {{ redis_mtls }} \
+        {% endif %}
+        ping
 
-        - name: "Verify Redis NO authentication"
-          when: not inv_install_redis_requirepass is defined
-          block:
-            - name: "Verify auth with no client cert, no ssl, but no password"
-              when: not inv_install_redis_ssl and inv_install_redis_ssl_auth_client == "no"
-              register: redis_auth_result
-              failed_when: redis_auth_result.stdout != "PONG"
-              changed_when: redis_auth_result.rc != 0
-              loop: "{{ inv_install_redis_ports }}"
-              loop_control:
-                loop_var: port
-              ansible.builtin.command:
-                cmd: "redis-cli -h {{ inventory_hostname }} -p {{ port }} --no-auth-warning ping"
+    - name: "Verify Redis cluster installations"
+      when: inv_install_redis__cluster | default(false)
+      block:
+        - name: "Get Redis Sentinel service current state"
+          register: inv_install_redis__service_status
+          failed_when: not install_redis__service_status.status.ActiveState == 'active'
+          ansible.builtin.systemd:
+            name: "redis-sentinel"
 
-            - name: "Verify auth with client cert, no ssl and no password"
-              when: not inv_install_redis_ssl and inv_install_redis_ssl_auth_client == "yes"
-              register: redis_auth_result
-              failed_when: redis_auth_result.stdout != "PONG"
-              changed_when: redis_auth_result.rc != 0
-              loop: "{{ inv_install_redis_ports }}"
-              loop_control:
-                loop_var: port
-              ansible.builtin.command:
-                cmd: "redis-cli --cert {{ inv_install_redis_ssl_cert }} --key {{ inv_install_redis_ssl_key }} -h {{ inventory_hostname }} -p {{ port }} --no-auth-warning ping"
+        - name: "Check Redis Sentinel connectivity"
+          ansible.builtin.wait_for:
+            host: "{{ inventory_hostname }}"
+            port: "{{ inv_install_redis__sentinel_port }}"
+            timeout: 120
 
-            - name: "Verify auth with no client cert, ssl and no password"
-              when: inv_install_redis_ssl and inv_install_redis_ssl_auth_client == "no"
-              register: redis_auth_result
-              failed_when: redis_auth_result.stdout != "PONG"
-              changed_when: redis_auth_result.rc != 0
-              loop: "{{ inv_install_redis_ports }}"
-              loop_control:
-                loop_var: port
-              ansible.builtin.command:
-                cmd: "redis-cli --tls -h {{ inventory_hostname }} -p {{ port }} --no-auth-warning ping"
+        - name: "Verify role on MASTER"
+          register: install_redis__result
+          when: inventory_hostname == inv_install_redis__initial_master
+          failed_when: install_redis__result.stdout != "role:master"
+          changed_when: install_redis__result.rc != 0
+          ansible.builtin.shell: |
+            redis-cli -h {{ inventory_hostname }} -p {{ inv_install_redis__port }} \
+            {% if redis_auth | default(false) %}
+            {{ redis_auth }} \
+            {% endif %}
+            {% if redis_tls | default(false) %}
+            {{ redis_tls }} \
+            {% endif %}
+            {% if redis_mtls | default(false) %}
+            {{ redis_mtls }} \
+            {% endif %}
+            info \
+            | grep role:
 
-            - name: "Verify auth with client cert, ssl and no password"
-              when: inv_install_redis_ssl and inv_install_redis_ssl_auth_client == "yes"
-              register: redis_auth_result
-              failed_when: redis_auth_result.stdout != "PONG"
-              changed_when: redis_auth_result.rc != 0
-              loop: "{{ inv_install_redis_ports }}"
-              loop_control:
-                loop_var: port
-              ansible.builtin.command:
-                cmd: "redis-cli --cert {{ inv_install_redis_ssl_cert }} --key {{ inv_install_redis_ssl_key }} -h {{ inventory_hostname }} -p {{ port }} --no-auth-warning ping"
+        - name: "Verify role on SALVE"
+          register: install_redis__result
+          when: inventory_hostname != inv_install_redis__initial_master
+          failed_when: install_redis__result.stdout != "role:slave"
+          changed_when: install_redis__result.rc != 0
+          ansible.builtin.shell: |
+            redis-cli -h {{ inventory_hostname }} -p {{ inv_install_redis__port }} \
+            {% if redis_auth | default(false) %}
+            {{ redis_auth }} \
+            {% endif %}
+            {% if redis_tls | default(false) %}
+            {{ redis_tls }} \
+            {% endif %}
+            {% if redis_mtls | default(false) %}
+            {{ redis_mtls }} \
+            {% endif %}
+            info \
+            | grep role:

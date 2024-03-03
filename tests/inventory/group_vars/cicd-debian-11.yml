@@ -1,0 +1,7 @@
+---
+inv_install_redis__cluster_hosts:
+  - "molecule-cicd-debian-11-instance-1-deploy-redis"
+  - "molecule-cicd-debian-11-instance-2-deploy-redis"
+  - "molecule-cicd-debian-11-instance-3-deploy-redis"
+
+inv_install_redis__initial_master: "molecule-cicd-debian-11-instance-1-deploy-redis"
