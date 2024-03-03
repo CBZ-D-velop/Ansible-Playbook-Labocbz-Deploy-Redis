@@ -133,6 +133,7 @@ Here you can put your change to keep a trace of your work and decisions.
 * Added multi cluster with Molecule
 * Added cluster start (Sentinel)
 * Removed idempotency (Sentinel edition files)
+* Edited readme for new architectures choices
 
 ## Authors
 
