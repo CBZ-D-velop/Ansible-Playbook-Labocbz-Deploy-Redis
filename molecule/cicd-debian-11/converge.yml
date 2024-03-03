@@ -1,7 +1,7 @@
 ---
-- name: "Include labocbz.deploy_pihole playbook"
+- name: "Include labocbz.deploy_redis playbook"
   tags:
-      - "labocbz.deploy_pihole"
+      - "labocbz.deploy_redis"
   vars:
     tower_env: "cicd-debian-11"
   ansible.builtin.import_playbook: "../../playbook.yml"
