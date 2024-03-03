@@ -1,38 +1,32 @@
 ---
 # if you have any prepararion task
 - name: "Prepare"
-  hosts: "all"
+  hosts: "local"
   gather_facts: true
   tasks:
 
-    - name: "Include cryptographic content var file"
-      ansible.builtin.include_vars: "../../tests/certs/main.yml"
+    #- name: "Include cryptographic content var file"
+    #  ansible.builtin.include_vars: "../../tests/certs/main.yml"
 
     - name: "Gather facts from all hosts"
       delegate_to: "{{ item }}"
       delegate_facts: true
-      loop: "{{ groups['all'] }}"
+      loop: "{{ groups['local'] }}"
       ansible.builtin.setup:
 
     - name: "Edit /etc/hosts file to add all hosts"
-      loop: "{{ groups['all'] }}"
+      loop: "{{ groups['local'] }}"
       loop_control:
         loop_var: host
       register: output
       changed_when: output.rc != 0
       ansible.builtin.shell: "echo \"{{ hostvars[host]['ansible_default_ipv4']['address'] }}  {{ host }} # from Molecule\" >> /etc/hosts"
 
-# if you have any prepararion task
-- name: "Prepare"
-  hosts: "all:&REDIS"
-  gather_facts: true
-  tasks:
-
     - name: "Import cryptographic content if needed (cert)"
-      loop: "{{ inv_install_redis_cert_bundles }}"
+      loop: "{{ inv_install_redis__cert_bundles }}"
       loop_control:
         loop_var: bundle
-      when: inv_install_redis_cert_bundles is defined and bundle.type == "cert"
+      when: inv_install_redis__cert_bundles is defined and bundle.type == "cert"
       ansible.builtin.copy:
         src: "../../tests/certs/{{ bundle.name }}.zip"
         dest: "/tmp/{{ bundle.name }}.zip"
@@ -41,10 +35,10 @@
         mode: 0700
 
     - name: "Import cryptographic content if needed (CA)"
-      loop: "{{ inv_install_redis_cert_bundles }}"
+      loop: "{{ inv_install_redis__cert_bundles }}"
       loop_control:
         loop_var: bundle
-      when: inv_install_redis_cert_bundles is defined and bundle.type == "CA"
+      when: inv_install_redis__cert_bundles is defined and bundle.type == "CA"
       ansible.builtin.copy:
         src: "../../tests/certs/{{ bundle.name }}"
         dest: "/tmp/{{ bundle.name }}"

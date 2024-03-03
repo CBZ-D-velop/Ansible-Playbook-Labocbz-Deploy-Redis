@@ -1,39 +1,40 @@
 ---
 inv_install_redis: true
 
-inv_prepare_host_redis_system_users:
+inv_prepare_host__redis_system_users:
   - login: "redis"
     group: "redis"
 
-inv_logrotate_redis_configurations:
+inv_add_logrotate_confs__redis_configurations:
   - "redis-server"
 
-inv_install_redis_bind: "0.0.0.0"
-inv_install_redis_proteced_mode: "no"
-inv_install_redis_loglevel: "notice"
-inv_install_redis_requirepass: "mySecret"
+inv_install_redis__user: "redis"
+inv_install_redis__group: "redis"
 
-inv_install_redis_cluster: false
-inv_install_redis_cluster_replicas: 1
-inv_install_redis_cluster_bootstrap: false
+inv_install_redis__bind: "127.0.0.1 {{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+inv_install_redis__port: 6379
 
-inv_install_redis_path: "/etc/redis/redis-server-{{ port }}"
-inv_install_redis_conf: "{{ inv_install_redis_path }}/redis.conf"
+inv_install_redis__proteced_mode: "no"
+inv_install_redis__loglevel: "notice"
+inv_install_redis__requirepass: "mySecret"
 
-inv_install_redis_ports:
-  - 6379
-#  - 6380
-#  - 6381
+inv_install_redis__cluster: true
+#inv_install_redis__initial_master: "srv1.domain.tld"
+inv_install_redis__initial_mastername: "mymaster"
+inv_install_redis__sentinel_port: 5000
 
-inv_install_redis_ssl: true
-inv_install_redis_ssl_domain: "my-redis-server.domain.tld"
-inv_install_redis_ssl_path: "/etc/redis/ssl"
-inv_install_redis_ssl_key: "{{ inv_install_redis_ssl_path }}/{{ inv_install_redis_ssl_domain }}/{{ inv_install_redis_ssl_domain }}.pem.key"
-inv_install_redis_ssl_cert: "{{ inv_install_redis_ssl_path }}/{{ inv_install_redis_ssl_domain }}/{{ inv_install_redis_ssl_domain }}.pem.crt"
-inv_install_redis_ssl_ca: "{{ inv_install_redis_ssl_path }}/{{ inv_install_redis_ssl_domain }}/ca-chain.pem.crt"
-inv_install_redis_ssl_auth_client: "no"
+inv_install_redis__log_path: "/var/log/redis"
+inv_install_redis__logfile: "{{ inv_install_redis__log_path }}/redis.log"
 
-inv_install_redis_cert_bundles:
+inv_install_redis__ssl: true
+inv_install_redis__ssl_domain: "my-redis-cluster.domain.tld"
+inv_install_redis__ssl_path: "/etc/redis/ssl"
+inv_install_redis__ssl_key: "{{ inv_install_redis__ssl_path }}/{{ inv_install_redis__ssl_domain }}/{{ inv_install_redis__ssl_domain }}.pem.key"
+inv_install_redis__ssl_cert: "{{ inv_install_redis__ssl_path }}/{{ inv_install_redis__ssl_domain }}/{{ inv_install_redis__ssl_domain }}.pem.crt"
+inv_install_redis__ssl_client_auth: true
+inv_install_redis__ssl_ca: "{{ inv_install_redis__ssl_path }}/{{ inv_install_redis__ssl_domain }}/ca-chain.pem.crt"
+
+inv_install_redis__cert_bundles:
   - name: "My-Local-Ansible-Root-CA.pem.crt"
     type: "CA"
     src: "/tmp/My-Local-Ansible-Root-CA.pem.crt"
@@ -46,10 +47,10 @@ inv_install_redis_cert_bundles:
     type: "CA"
     src: "/tmp/My-Local-Ansible-Intermediate-CA-2.pem.crt"
 
-  - name: "my-redis-server.domain.tld"
+  - name: "my-redis-cluster.domain.tld"
     type: "cert"
-    src: "/tmp/my-redis-server.domain.tld.zip"
-    dest: "{{ inv_install_redis_ssl_path }}"
+    src: "/tmp/my-redis-cluster.domain.tld.zip"
+    dest: "{{ inv_install_redis__ssl_path }}"
     #src_user: "myUser"
     #src_password: "secretPassword"
     dest_user: "redis"

@@ -1,1 +1,7 @@
 ---
+inv_install_redis__cluster_hosts:
+  - "molecule-local-instance-1-deploy-redis"
+  - "molecule-local-instance-2-deploy-redis"
+  - "molecule-local-instance-3-deploy-redis"
+
+inv_install_redis__initial_master: "molecule-local-instance-1-deploy-redis"
