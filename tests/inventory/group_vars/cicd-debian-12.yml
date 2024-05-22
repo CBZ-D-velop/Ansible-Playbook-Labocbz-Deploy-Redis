@@ -1,4 +1,6 @@
 ---
+tower_env: "cicd-debian-12"
+
 inv_install_redis__cluster_hosts:
   - "molecule-cicd-debian-12-instance-1-deploy-redis"
   - "molecule-cicd-debian-12-instance-2-deploy-redis"

@@ -1,4 +1,6 @@
 ---
+tower_env: "cicd-ubuntu-22"
+
 inv_install_redis__cluster_hosts:
   - "molecule-cicd-ubuntu-22-instance-1-deploy-redis"
   - "molecule-cicd-ubuntu-22-instance-2-deploy-redis"
