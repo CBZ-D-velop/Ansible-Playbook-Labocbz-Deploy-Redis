@@ -26,7 +26,7 @@ Redis clustering is base on Master/Slave replication. One Master is available at
 
 ## Deployment diagramm
 
-![](./assets/Ansible-Playbook-Labocbz-Deploy-Redis.drawio.svg)
+![Ansible-Playbook-Labocbz-Deploy-Redis](./assets/Ansible-Playbook-Labocbz-Deploy-Redis.drawio.svg)
 
 This is a potential deployment carried out using this playbook. We can observe a Redis service component along with its subsystem. This subsystem consists of nine servers distributed across three hosts. Therefore, a Master/Slave replication cluster with 3 servers is possible. Communications are end-to-end encrypted with TLS, and mTLS can be enabled to, you have to add a load balancer for write opérations.
 
@@ -37,7 +37,6 @@ This is a potential deployment carried out using this playbook. We can observe a
 You have to run multiples tests. *tests with an # are mandatory*
 
 ```MARKDOWN
-# lint
 # syntax
 # converge
 # idempotence
@@ -62,7 +61,6 @@ yamllint -c ./.yamllint .
 ansible-lint --config=./.ansible-lint .
 
 # Execute and test your playbook
-molecule lint
 molecule create
 molecule list
 molecule converge
@@ -134,6 +132,14 @@ Here you can put your change to keep a trace of your work and decisions.
 * Added cluster start (Sentinel)
 * Removed idempotency (Sentinel edition files)
 * Edited readme for new architectures choices
+
+### 2024-05-19: New CI
+
+* Added Markdown lint to the CICD
+* Rework all Docker images
+* Change CICD vars convention
+* New workers
+* Removed all automation based on branch
 
 ## Authors
 

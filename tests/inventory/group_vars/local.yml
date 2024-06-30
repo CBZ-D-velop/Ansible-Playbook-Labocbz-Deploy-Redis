@@ -1,4 +1,6 @@
 ---
+tower_env: "local"
+
 inv_install_redis__cluster_hosts:
   - "molecule-local-instance-1-deploy-redis"
   - "molecule-local-instance-2-deploy-redis"
